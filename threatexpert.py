@@ -12,7 +12,7 @@ import urllib2
 import commands 
 import cgi
 
-email_account="stbu-toc@cisco.com"
+email_account="****@****"
 
 def get_V(p, regex=None):
     """return cgi GET parameter; strip white spaces at both ends if any;
