@@ -5,14 +5,16 @@
 // @license        GPL version 3 or later; http://www.gnu.org/copyleft/gpl.html
 // @include        http://fanfou.com/* 
 // @namespace      Rex Zhasm (http://fanfou.com/zhasm)
-// @version        0.0.0.2
-// history:        0.0.0.2:  
+// @version        0.0.0.4
+// history:        0.0.0.4:  
 
 // ==/UserScript==
 
 
-var g_keywords="轮功,"; // you may add your own ',' separeted keywords;
-var g_sources="街旁,";    
+var g_keywords="轮功, "; // you may add your own ',' separeted keywords;
+var g_sources="街旁, ";    
+var g_case=0;           //set this to 1 for case sensitive search. default 0, case in-sensitive;
+
 
 //loading external js;
 //the jQuery library is same with wanghui's;
@@ -49,30 +51,52 @@ function str2regex(s)
 {
     //'abc,xyz'=> /abc|xyz/i
 
-    var s=s.trim().split(",").join("|");
-    return eval("/"+s+"/"); 
+    var s=s.replace(/\s*,\s*/g, '|'); 
+    s=s.trim();
+    s=s.replace(/[\|,]+$/, '');
+    if (g_case==0)  //default 0
+    {
+        s="/"+s+"/i";
+        return eval(s); 
+    }
+    else
+    {
+        return eval("/"+s+"/"); 
+    }
 }
 
+function hideItem(item)
+{
+    //item is a child
+    var parent=item.parent();
+    var sibling=parent.children();
+    parent.click(function () {
+        parent.attr("style","");    //reset style to default;
+        sibling.fadeIn('slow');     //show('slow'); 
+    });
+    sibling.hide();
+    parent.attr("style", "min-height:0px; height:5px");
+}
 function filter(k, s)
 {
     //filter content that is matched regex k
     //and source that is matched by regex s
-    $(".content").each(function(){
-        var content='*#$'+$(this).html();
-        var result=content.search(k);
-        result=parseInt(result);
-        if ( result>0 ) // -1 means not found
-        {
-            $(this).parent().hide(); 
-        }
-    });
     $(".method").each(function(){
         var content="@#$"+$(this).html();
         var result=content.search(s);
         result=parseInt(result);
         if ( result >0 )
         {
-            $(this).parent().parent().hide();//.parent().hide(); 
+            hideItem($(this).parent());
+        }
+    });
+    $(".content").each(function(){
+        var content='*#$'+$(this).html();
+        var result=content.search(k);
+        result=parseInt(result);
+        if ( result>0 ) // -1 means not found
+        {
+            hideItem($(this));
         }
     });
 
@@ -92,3 +116,4 @@ function letsJQuery() {
             }, 500);
     }); 
 } 
+
